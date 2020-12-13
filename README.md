@@ -78,152 +78,57 @@ Catatan
 7. Pembagian IP dan routing harus SE-EFISIEN MUNGKIN.
 8. Pastikan semua UML dapat melakukan ping ke its.ac.id
 
-## Persiapan
-### Setting Topologi
-Sebelum mejawab pertanyaan no 1, kita harus membuat topologi yang benar, buka xming dan putty, lalu buka openvpn connect, pertama konekkan vpn menggunakan .ovpn yang diberi asisten, lalu gunakan putty logi menggunakan IP pada modul sesuai kelompok, lalu buat topologi.sh menggunakan 
-```bash
-nano topologi.sh
-```
-lalu tuliskan
-```sh
-# Switch
-uml_switch -unix switch1 > /dev/null < /dev/null &
-uml_switch -unix switch2 > /dev/null < /dev/null &
+## Jawaban
+### Cisco packet tracer (VLSM)
 
-# Router
-xterm -T SURABAYA -e linux ubd0=SURABAYA,jarkom umid=SURABAYA eth0=tuntap,,,'ip_tuntap_tiap_kelompok' eth1=daemon,,,switch2 eth2=daemon,,,switch1 mem=96M &
+1. Install [cisco packet tracer](https://www.netacad.com/courses/packet-tracer)
+2. Setup topologi dengan menambahkan Cloud PT, Switch, Router dan PC
+3. Sambungkan setiap komponen menggunakan Connection -> Auto Choose conn Type
+4. beberapa router tidak dapat disambungkan lebih dari 2 cabang maka gunakan klik pada router, lalu pada tab physical pilih:
+    - Surabaya      = NM-4E (Karena membutuhkan 5 koneksi: 2 default, 4 tambahan)
+    ![screenshot][screenshot2]
+    - Pasuruan      = NM-1FE-TX (karena membutuhkan 3 koneksi: 2 default, 1 tambahan)
+    ![screenshot][screenshot3]
+    - Probolinggo   = NM-1FE-TX (karena membutuhkan 3 koneksi: 2 default, 1 tambahan)
+    ![screenshot][screenshot3]
+    - Batu          = NM-2FE2W (karena membutuhkan 4 koneksi: 2 default, 2 tambahan)
+    ![screenshot][screenshot4]
+    - Kediri        = NM-1FE-TX (karena membutuhkan 3 koneksi: 2 default, 1 tambahan)
+    ![screenshot][screenshot3]
 
-# Server
-xterm -T MALANG -e linux ubd0=MALANG,jarkom umid=MALANG eth0=daemon,,,switch2 mem=126M &
-xterm -T MOJOKERTO -e linux ubd0=MOJOKERTO,jarkom umid=MOJOKERTO eth0=daemon,,,switch2 mem=126M &
-xterm -T PROBOLINGGO -e linux ubd0=PROBOLINGGO,jarkom umid=PROBOLINGGO eth0=daemon,,,switch2 mem=126M &
-
-# Klien
-xterm -T SIDOARJO -e linux ubd0=SIDOARJO,jarkom umid=SIDOARJO eth0=daemon,,,switch1 mem=96M &
-xterm -T GRESIK -e linux ubd0=GRESIK,jarkom umid=GRESIK eth0=daemon,,,switch1 mem=96M &
-```
-lalu seting interfaces sesuai modul, sedangkan probolinggo mirip dengan malang namun menggunakan ip probolinggo. lalu melakukan ``iptables –t nat –A POSTROUTING –o eth0 –j MASQUERADE –s 192.168.0.0/16`` pada router suarabaya lalu melakukan export.
-### Setting DNS
-lakukan ``apt-get update`` pada UML malang, lalu install bind9 menggunakan command ``apt-get install bind9 -y``, pada uml yang sama, gunakan konfigurasi pada ``/etc/bind/named.conf.local`` untuk menambahkan
-```
-zone "semerut05.pw" {
-	type master;
-	file "/etc/bind/jarkom/semerut05.pw";
-};
-```
-Buat folder jarkom di dalam /etc/bind
-
-```
-mkdir /etc/bind/jarkom
-```
-
-Copykan file db.local pada path /etc/bind ke dalam folder jarkom yang baru saja dibuat dan ubah namanya menjadi semerut05.pw
-
-```
-cp /etc/bind/db.local /etc/bind/jarkom/semeruyyy.pw
-```
-
-Kemudian buka file semeruyyy.pw dan edit seperti gambar berikut dengan IP MALANG masing-masing kelompok:
-```
-nano /etc/bind/jarkom/semeruyyy.pw
-```
-<br />
-
-![screenshot][screenshot2]
-
-<br />
-
-Restart bind9 dengan perintah
-
-```
-service bind9 restart
-
-ATAU
-
-named -g //Bisa digunakan untuk restart sekaligus debugging
-```
-
-Lalu membuat DNS Reverse(sesuai modul)
-
-Lalu agar kita dapat mengakses website menggunakan semeruyyy.pw dan tidak perlu mengetikkan IP maka kita menggunakan cname
-tambahkan, seperti gambar
-<br />
-
-![screenshot][screenshot2]
-
-<br />
-Kemudian restart bind9 dengan perintah
-
-service bind9 restart
-Lalu cek dengan melakukan ``host -t CNAME www.semeruyyy.pw`` atau ``ping www.semeruyyy.pw``. Hasilnya harus mengarah ke host dengan IP MALANG.
-
-untuk membuat dns slave, kita gunakan server malang ``nano /etc/bind/named.conf.local`` lalu tambahkan
-```
-zone "semeruyyy.pw" {
-    type master;
-    notify yes;
-    also-notify { "IP MOJOKERTO"; }; // Masukan IP MOJOKERTO tanpa tanda petik
-    allow-transfer { "IP MOJOKERTO"; }; // Masukan IP MOJOKERTO tanpa tanda petik
-    file "/etc/bind/jarkom/semeruyyy.pw";
-};
-```
-Lakukan restart bind9
-
-``service bind9 restart``
-
-lalu pada mojokerto, update package lists dengan menjalankan command:
-
-``apt-get update`` lalu ``apt-get install bind9 -y`` kemudian ``nano /etc/bind/named.conf.local`` tambahkan
-```
-zone "semeruyyy.pw" {
-    type slave;
-    masters { "IP MALANG"; }; // Masukan IP MALANG tanpa tanda petik
-    file "/var/lib/bind/semeruyyy.pw";
-};
-```
-<br />
-
-![screenshot][screenshot3]
-
-<br />
-
-Lakukan restart bind9
-
-``service bind9 restart``
-
-membuat sub domain ``nano /etc/bind/jarkom/semerut05.pw`` tambahkan seperti gambar
-<br />
-
-![screenshot][screenshot4]
-
-<br />
-
-lalu ``service bind9 restart``
-lalu coba ping apakah berhasil
-
-<br />
-
+## Pembagian IP & Netmask
+kita bagi dulu koneksi yang membutuhkan network, terciptalah A1-A13 seperti pada gambar
 ![screenshot][screenshot5]
 
-<br />
+lalu kita hitung kebutuhan host pada setiap jaringan A1-13 lalu didapatkan seperti gambar berikut
+![screenshot][screenshot6]
 
-setelah itu membuat delegasi sub-domain ``nano /etc/bind/jarkom/semerut05.pw`` pada malang
+lalu setelah mendapatkan submasknya, kita dapat membagi IP berdasarkan IP terbesar 192.168.0.0/19 karena submask total adalah /19, lalu didapatkan ip sebagai berikut:
+![screenshot][screenshot7]
 
-<br />
+## Implementasi pada Cisco
+lalu setelah kita bagi, kita masukkan kedalam cisco sesuai pada pembagian ip dan subnet pada sebelumnya, saya ambil contoh pada A1, maka IP Networknya 192.168.0.16/28 maka usable IP pertamanya adalah 192.168.0.17 dimasukkan pada router pada Fa 0/1 karena Fa0/1 adalah koneksi menuju bojonegoro dimana adalah A1 lalu pada bojonegoro, kita set 192.168.0.18 lalu gatewaynya adalah 192.168.0.17.
+![screenshot][screenshot8]
+![screenshot][screenshot9]
+dan begitu terus untuk semua dari A1-A13
 
-![screenshot][screenshot2]
+## Routing
+untuk routing kita harus memasukkan route yang tidak dikenali oleh router tersebut, karena tidak bertetangga-an:
+- Surabaya = A1,A2,A3,A4,A5,A6,A9,A10,A11,A12,Malang = 11 + 1 default 0.0.0.0/0 = 12
+- Pasuruan = A12,A11 = 2 + 1 default 0.0.0.0/0 = 3
+- Probolinggo = 1 default 0.0.0.0/0
+- Batu = A1,A6,A5,Malang = 4 + 1 default 0.0.0.0/0 = 5
+- Madiun = 1 default 0.0.0.0/0
+- Kediri = A6 + 1 default 0.0.0.0/0 = 2
+- Blitar = 1 default 0.0.0.0/0
 
-<br />
+seperti gambar berikut saya beri contoh pada surabaya
+![screenshot][screenshot10]
 
-lalu ``service bind9 restart``
+## Hasil
+![screenshot][screenshot11]
 
-## Setting Web Service
 
-
-## Jawaban
-<!-- GETTING STARTED -->
-
- 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [contributors-shield]: https://img.shields.io/github/contributors/peacefulhack/Jarkom_Modul4_Lapres_T5?style=flat-square
@@ -232,7 +137,7 @@ lalu ``service bind9 restart``
 [stars-url]: https://github.com/peacefulhack/Jarkom_Modul4_Lapres_T5/stargazers
 [kelompok-shield]: https://img.shields.io/badge/Kelompok-T05-blue
 [kelompok-url]: https://github.com/peacefulhack/Jarkom_Modul4_Lapres_T5/
-[screenshot1]: images/screenshot1.png
+[screenshot1]: images/ss1.png
 [screenshot2]: images/ss2.png
 [screenshot3]: images/ss3.png
 [screenshot4]: images/ss4.png
