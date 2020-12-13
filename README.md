@@ -53,10 +53,12 @@
 ## Daftar Isi
 
 * [Soal](#Soal)
-* [Persiapan](#Persiapan)
-  * [Setting Topologi](#Setting-Topologi)
-  * [Setting DNS](#Setting-DNS)
 * [Jawaban](#Jawaban)
+  * [Cisco packet tracer (VLSM)](#Cisco-packet-tracer-(VLSM))
+  * [Pembagian IP & Netmask](#Pembagian-IP-&-Netmask)
+  * [Implementasi pada Cisco](#Implementasi-pada-Cisco)
+  * [Routing](#Routing)
+  * [Hasil](#Hasil)
 
 
 
