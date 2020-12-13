@@ -41,7 +41,7 @@
     <br />
     <a href="https://github.com/peacefulhack/Jarkom_Modul4_Lapres_T5/tree/main/images">Gambar</a>
     ·
-    <a href="https://github.com/peacefulhack/Jarkom_Modul4_Lapres_T5/pulse">Grafik</a>
+    <a href="https://github.com/peacefulhack/Jarkom_Modul4_Lapres_T5/tree/main/file%20cisco">File PKT Cisco</a>
     ·
     <a href="https://github.com/peacefulhack/Jarkom_Modul4_Lapres_T5/issues">Lihat issue</a>
   </p>
